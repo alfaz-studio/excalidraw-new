@@ -296,7 +296,6 @@ import {
 // Side-effect import: installs the Object.fromEntries polyfill before the lazy
 // `import("@excalidraw/mermaid-to-excalidraw")` (paste-as-mermaid path) evaluates
 // on runtimes missing that ES2019 global (issue 019ecaf5).
-import "../polyfills/objectFromEntries";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
@@ -11574,15 +11573,15 @@ class App extends React.Component<AppProps, AppState> {
       actionCopyStyles,
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
-      !this.props.UIOptions.canvasActions.disableGrouping && actionGroup,
+      actionGroup,
       actionTextAutoResize,
-      !this.props.UIOptions.canvasActions.disableGrouping && actionUnbindText,
-      !this.props.UIOptions.canvasActions.disableGrouping && actionBindText,
+      actionUnbindText,
+      actionBindText,
       actionWrapTextInContainer,
-      !this.props.UIOptions.canvasActions.disableGrouping && actionUngroup,
+      actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       !this.props.UIOptions.canvasActions.hideLibraries && actionAddToLibrary,
-      ...(!this.props.UIOptions.canvasActions.hideLayers ? zIndexActions : []),
+      ...zIndexActions,
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
       actionFlipVertical,
