@@ -53,6 +53,7 @@ import {
   distance,
   getFontString,
   getNearestScrollableContainer,
+  isElementRendered,
   isInputLike,
   isToolIcon,
   isWritableElement,
@@ -5223,6 +5224,16 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       if (!this.isInteractionEnabled()) {
+        return;
+      }
+
+      // SONACOVE: the meet client keeps a closed board mounted under
+      // `display: none`, where edits from page-wide keys would still sync to
+      // every participant unseen (#1096).
+      if (
+        this.props.handleKeyboardGlobally &&
+        !isElementRendered(this.excalidrawContainerRef.current)
+      ) {
         return;
       }
 
