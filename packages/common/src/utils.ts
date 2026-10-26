@@ -146,8 +146,9 @@ export const isElementRendered = (
   if (typeof element.checkVisibility === "function") {
     return element.checkVisibility();
   }
+  const view = element.ownerDocument.defaultView ?? window;
   for (let node: Element | null = element; node; node = node.parentElement) {
-    if (getComputedStyle(node).display === "none") {
+    if (view.getComputedStyle(node).display === "none") {
       return false;
     }
   }
