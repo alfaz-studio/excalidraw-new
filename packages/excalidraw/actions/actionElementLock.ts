@@ -2,6 +2,7 @@ import { KEYS, arrayToMap, randomId } from "@excalidraw/common";
 
 import {
   elementsAreInSameGroup,
+  getNonDeletedElements,
   newElementWith,
   selectGroupsFromGivenElements,
 } from "@excalidraw/element";
@@ -114,23 +115,18 @@ export const actionToggleElementLock = register({
     );
     const nextSelectedGroupIds = nextLockState
       ? {}
-      : selectGroupsFromGivenElements(unlockedSelectedElements, appState);
+      : selectGroupsFromGivenElements(
+          getNonDeletedElements(unlockedSelectedElements),
+          appState,
+        );
 
-    // SONACOVE: `activeLockedId` means "the element the action bar points at",
-    // so it survives unlocking — the bar's other actions become useful exactly
-    // then. The exception is a MULTI-element unlock, which dissolves the
-    // temporary group just above and would leave the bar anchored to nothing.
-    let activeLockedId: string | null = null;
-
-    if (newGroupId) {
-      activeLockedId = nextLockState ? newGroupId : null;
-    } else if (isAGroup) {
-      activeLockedId = nextLockState
+    const activeLockedId = nextLockState
+      ? newGroupId
+        ? newGroupId
+        : isAGroup
         ? selectedElements[0].groupIds.at(-1)!
-        : null;
-    } else {
-      activeLockedId = selectedElements[0].id;
-    }
+        : selectedElements[0].id
+      : null;
 
     return {
       elements: nextElements,
@@ -200,16 +196,17 @@ export const actionUnlockAllElements = register({
     const unlockedElements = lockedElements.map(
       (el) => nextElementsMap.get(el.id) || el,
     );
+    const unlockedNonDeletedElements = getNonDeletedElements(unlockedElements);
 
     return {
       elements: nextElements,
       appState: {
         ...appState,
         selectedElementIds: Object.fromEntries(
-          lockedElements.map((el) => [el.id, true]),
+          unlockedNonDeletedElements.map((el) => [el.id, true]),
         ),
         selectedGroupIds: selectGroupsFromGivenElements(
-          unlockedElements,
+          unlockedNonDeletedElements,
           appState,
         ),
         lockedMultiSelections: {},
